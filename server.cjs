@@ -55,20 +55,36 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
       'http://localhost:8082'
     ];
 
+// More permissive CORS for deployment troubleshooting
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
+    console.log(`🌐 CORS check - Origin: ${origin}, Allowed: ${allowedOrigins.join(', ')}`);
     
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) {
+      console.log('✅ CORS: Allowing request with no origin');
+      return callback(null, true);
+    }
+    
+    // Check if origin is in allowed list
     if (allowedOrigins.indexOf(origin) !== -1) {
+      console.log('✅ CORS: Origin allowed');
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      console.log('❌ CORS: Origin not allowed');
+      // For deployment troubleshooting, allow all origins temporarily
+      if (process.env.NODE_ENV === 'production') {
+        console.log('⚠️ CORS: Allowing all origins in production for troubleshooting');
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'OPTIONS', 'HEAD'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'User-Agent'],
+  optionsSuccessStatus: 200 // For legacy browser support
 }));
 
 // Middleware
