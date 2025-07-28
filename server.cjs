@@ -52,7 +52,8 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
       'http://localhost:3001', 
       'http://localhost:8080', 
       'http://localhost:8081', 
-      'http://localhost:8082'
+      'http://localhost:8082',
+    'https://think-ai-rosy.vercel.app/'
     ];
 
 // More permissive CORS for deployment troubleshooting
